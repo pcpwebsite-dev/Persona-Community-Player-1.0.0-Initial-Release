@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Forms — Builder</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/builder.css"></head>
+<body>
+<header class="topbar"><div class="bar"><a class="brand" href="./dashboard.html"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><div class="builder-actions"><span id="saveState" class="muted">Saved</span><button class="btn" id="preview">PREVIEW</button><button class="btn primary" id="publish">PUBLISH</button><button class="btn" id="back">BACK</button></div></div></header>
+<main class="builder container">
+<section class="editor">
+  <div class="card form-settings">
+    <input id="title" class="title-input" placeholder="Form title">
+    <textarea id="description" placeholder="Form description"></textarea>
+  </div>
+  <div id="questions"></div>
+  <button class="add-question btn primary">+ ADD QUESTION</button>
+</section>
+<aside class="card settings">
+  <h3>FORM SETTINGS</h3>
+  <label class="switch-row"><span>Collect email</span><input id="collectEmail" type="checkbox"></label>
+  <label class="switch-row"><span>Show progress</span><input id="showProgress" type="checkbox"></label>
+  <label class="switch-row"><span>Shuffle questions</span><input id="shuffle" type="checkbox"></label>
+  <div class="field"><label>Confirmation message</label><textarea id="confirmation">Terima kasih atas respons Anda.</textarea></div>
+  <div class="share-box"><small>PUBLIC FORM URL</small><input id="shareUrl" readonly><button class="btn" id="copyUrl">COPY</button></div>
+</aside>
+</main>
+<script type="module">
+import {auth,db,onAuthStateChanged,doc,getDoc,updateDoc,serverTimestamp} from "../js/firebase.js";
+const id=new URLSearchParams(location.search).get("id");let formData,user,questions=[];
+const qEl=document.querySelector("#questions");
+onAuthStateChanged(auth,async u=>{if(!u)location.href="./index.html";else{user=u;await load()}});
+async function load(){if(!id)return;const s=await getDoc(doc(db,"forms",id));if(!s.exists())return alert("Form tidak ditemukan");formData=s.data();title.value=formData.title||"";description.value=formData.description||"";collectEmail.checked=!!formData.settings?.collectEmail;showProgress.checked=!!formData.settings?.showProgress;shuffle.checked=!!formData.settings?.shuffleQuestions;confirmation.value=formData.settings?.confirmationMessage||"Terima kasih atas respons Anda.";questions=formData.questions||[];render();shareUrl.value=new URL("../form/index.html?id="+id,location.href).href}
+function render(){qEl.innerHTML="";questions.forEach((q,i)=>{const el=document.createElement("div");el.className="question card";el.innerHTML=`<div class="q-head"><span class="q-number">Q${i+1}</span><select class="q-type">${types.map(t=>`<option value="${t.v}" ${q.type===t.v?"selected":""}>${t.l}</option>`).join("")}</select><label class="req"><input type="checkbox" ${q.required?"checked":""}> Required</label></div><input class="q-title" value="${esc(q.title||"Untitled question")}" placeholder="Question"><div class="q-extra"></div><div class="q-actions"><button class="btn up">↑</button><button class="btn down">↓</button><button class="btn duplicate">DUPLICATE</button><button class="btn danger remove">DELETE</button></div>`;const extra=el.querySelector(".q-extra");renderExtra(extra,q);el.querySelector(".q-type").onchange=e=>{q.type=e.target.value;render()};el.querySelector(".q-title").oninput=e=>q.title=e.target.value;el.querySelector(".req input").onchange=e=>q.required=e.target.checked;el.querySelector(".up").onclick=()=>move(i,-1);el.querySelector(".down").onclick=()=>move(i,1);el.querySelector(".remove").onclick=()=>{questions.splice(i,1);render()};el.querySelector(".duplicate").onclick=()=>{questions.splice(i+1,0,JSON.parse(JSON.stringify(q)));render()};qEl.appendChild(el)})}
+const types=[{v:"short",l:"Short answer"},{v:"paragraph",l:"Paragraph"},{v:"email",l:"Email"},{v:"number",l:"Number"},{v:"date",l:"Date"},{v:"time",l:"Time"},{v:"single",l:"Multiple choice"},{v:"multi",l:"Checkboxes"},{v:"dropdown",l:"Dropdown"},{v:"scale",l:"Linear scale"}];
+function renderExtra(el,q){if(["single","multi","dropdown"].includes(q.type)){q.options=q.options||["Option 1","Option 2"];el.innerHTML=`<div class="options">${q.options.map((o,j)=>`<div><input value="${esc(o)}"><button class="btn del-opt">×</button></div>`).join("")}<button class="btn add-opt">+ OPTION</button></div>`;el.querySelectorAll(".options>div").forEach((row,j)=>row.querySelector("input").oninput=e=>q.options[j]=e.target.value);el.querySelectorAll(".del-opt").forEach((b,j)=>b.onclick=()=>{q.options.splice(j,1);render()});el.querySelector(".add-opt").onclick=()=>{q.options.push("New option");render()}}else if(q.type==="scale"){q.min=q.min??1;q.max=q.max??5;el.innerHTML=`<div class="scale-row"><label>Min<input type="number" value="${q.min}"></label><label>Max<input type="number" value="${q.max}"></label></div>`;el.querySelectorAll("input").forEach((x,j)=>x.oninput=e=>j?q.max=+e.target.value:q.min=+e.target.value)}else el.innerHTML=`<div class="answer-preview">${q.type==="paragraph"?"Long answer":q.type==="email"?"name@example.com":"Short answer"}</div>`}
+function move(i,d){const n=i+d;if(n<0||n>=questions.length)return;[questions[i],questions[n]]=[questions[n],questions[i]];render()}
+document.querySelector(".add-question").onclick=()=>{questions.push({type:"short",title:"Untitled question",required:false});render()};
+async function save(publishOverride){saveState.textContent="Saving...";const payload={title:title.value.trim()||"Untitled PCP Form",description:description.value.trim(),questions,settings:{collectEmail:collectEmail.checked,showProgress:showProgress.checked,shuffleQuestions:shuffle.checked,confirmationMessage:confirmation.value.trim()},updatedAt:serverTimestamp()};if(publishOverride!==undefined)payload.published=publishOverride;await updateDoc(doc(db,"forms",id),payload);saveState.textContent="Saved";return payload}
+publish.onclick=async()=>{await save(true);publish.textContent="PUBLISHED";publish.disabled=true};
+preview.onclick=async()=>{await save();window.open("../form/index.html?id="+id,"_blank")};
+back.onclick=()=>location.href="./dashboard.html";
+copyUrl.onclick=()=>navigator.clipboard.writeText(shareUrl.value);
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+</script>
+</body></html>

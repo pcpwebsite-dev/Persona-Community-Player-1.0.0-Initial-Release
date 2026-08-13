@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Forms — Responses</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/admin.css"></head>
+<body>
+<header class="topbar"><div class="bar"><a class="brand" href="./dashboard.html"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><div class="actions"><button class="btn" id="back">FORMS</button><button class="btn" id="logout">SIGN OUT</button></div></div></header>
+<main class="container page"><section class="dash-head"><div><span class="badge">FIRESTORE / RESPONSES</span><h1>Response <span>Explorer</span></h1><p class="muted">Pilih form untuk melihat data jawaban yang tersimpan.</p></div><select id="formSelect"><option value="">Select form</option></select></section><div id="tableWrap" class="card table-wrap"><div class="empty">Pilih form.</div></div></main>
+<script type="module">
+import {auth,db,onAuthStateChanged,signOut,collection,getDocs,doc,getDoc} from "../js/firebase.js";
+onAuthStateChanged(auth,u=>{if(!u)location.href="./index.html";else loadForms()});
+logout.onclick=()=>signOut(auth);back.onclick=()=>location.href="./dashboard.html";
+async function loadForms(){const s=await getDocs(collection(db,"forms"));for(const d of s.docs){const o=document.createElement("option");o.value=d.id;o.textContent=d.data().title||d.id;formSelect.appendChild(o)}}
+formSelect.onchange=loadResponses;
+async function loadResponses(){const id=formSelect.value;if(!id)return;const fs=await getDoc(doc(db,"forms",id));const f=fs.data();const rs=await getDocs(collection(db,"forms",id,"responses"));let rows=[];for(const d of rs.docs){const r=d.data();rows.push(`<tr><td>${r.submittedAt?.toDate?r.submittedAt.toDate().toLocaleString("id-ID"):"—"}</td>${(f.questions||[]).map((q,i)=>`<td>${esc(value(r.answers?.["q"+i]))}</td>`).join("")}</tr>`)}tableWrap.innerHTML=rows.length?`<div class="table-scroll"><table><thead><tr><th>Submitted</th>${(f.questions||[]).map(q=>`<th>${esc(q.title)}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table></div><button class="btn export" id="export">EXPORT CSV</button>`:`<div class="empty">Belum ada response.</div>`;if(document.querySelector("#export"))export.onclick=()=>csv(f,rs)}
+function value(v){return Array.isArray(v)?v.join(", "):v??""}function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function csv(f,rs){const heads=["Submitted",(f.questions||[]).map(q=>q.title)].flat();const lines=[heads.map(x=>`"${String(x).replaceAll('"','""')}"`).join(",")];rs.forEach(d=>{const r=d.data();const vals=[r.submittedAt?.toDate?r.submittedAt.toDate().toISOString():"",(f.questions||[]).map((q,i)=>value(r.answers?.["q"+i]))].flat();lines.push(vals.map(x=>`"${String(x).replaceAll('"','""')}"`).join(","))});const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+lines.join("\\n")],{type:"text/csv;charset=utf-8"}));a.download="pcp-responses.csv";a.click()}
+</script>
+</body></html>

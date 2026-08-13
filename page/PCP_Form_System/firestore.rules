@@ -1,0 +1,40 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Global website settings: only authenticated admins can control maintenance mode.
+    match /siteSettings/{settingId} {
+      allow read, create, update, delete: if signedIn();
+    }
+
+    // Form definitions: only Firebase-authenticated users can manage forms.
+    // Public users can only read forms that are explicitly published.
+    match /forms/{formId} {
+      allow read: if signedIn() || resource.data.published == true;
+      allow create, update, delete: if signedIn();
+
+      // Public response endpoint:
+      // create is allowed without login; reads/updates/deletes are admin-only.
+      match /responses/{responseId} {
+        allow create: if
+          request.resource.data.keys().hasOnly([
+            'answers',
+            'submittedAt',
+            'userAgent',
+            'formVersion'
+          ])
+          && request.resource.data.answers is map
+          && request.resource.data.answers.size() <= 100
+          && request.resource.data.userAgent is string
+          && request.resource.data.userAgent.size() <= 1000;
+
+        allow read, update, delete: if signedIn();
+      }
+    }
+  }
+}

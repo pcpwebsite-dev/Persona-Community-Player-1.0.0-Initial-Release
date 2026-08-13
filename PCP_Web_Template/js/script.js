@@ -1,0 +1,1 @@
+const b=document.body;document.getElementById("theme").onclick=()=>b.classList.toggle("light")||b.classList.toggle("dark");

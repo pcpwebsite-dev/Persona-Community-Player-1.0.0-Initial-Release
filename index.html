@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PCP</title>
+<link rel="stylesheet" href="PCP_Web_Template/css/style.css">
+</head>
+<body class="dark">
+<div id="siteLoading" class="site-loading"><span>CHECKING SYSTEM...</span></div>
+
+<nav>
+  <img class="logo" src="asset/logo/txt.png">
+  <ul><li><a href="#">HOME</a></li><li><a href="#">COMMUNITY</a></li><li><a href="#">EVENTS</a></li><li><a href="#">CREATIVE</a></li><li><a href="#">GAMING</a></li><li><a href="#">ABOUT</a></li></ul>
+  <a class="btn" href="#">JOIN US</a>
+</nav>
+
+<header class="hero">
+  <div class="overlay">
+    <img class="title" src="asset/logo/txt.png">
+    <p>Sebuah komunitas untuk berkumpul, berinteraksi, dan berkembang bersama tanpa batas.</p>
+    <a class="btn" href="#">JOIN THE COMMUNITY</a>
+  </div>
+</header>
+
+<button id="theme">Toggle Theme</button>
+
+<script type="module">
+import { db, doc, getDoc } from "./js/firebase.js";
+
+const MAINTENANCE_URL = "./page/LockScreen/Maintenance/";
+const DEFAULT_SETTINGS = {
+  enabled: false,
+  title: "WEBSITE SEDANG DALAM MAINTENANCE",
+  description: "Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.",
+  progress: 72,
+  notice: "Mohon tunggu beberapa saat dan coba kembali nanti."
+};
+
+async function checkMaintenance() {
+  try {
+    const snap = await getDoc(doc(db, "siteSettings", "general"));
+    const settings = snap.exists() ? { ...DEFAULT_SETTINGS, ...snap.data() } : DEFAULT_SETTINGS;
+    if (settings.enabled === true) {
+      location.replace(MAINTENANCE_URL);
+      return;
+    }
+  } catch (error) {
+    // Fail-open: if Firestore is unavailable, the normal homepage remains accessible.
+    console.error("Maintenance check failed:", error);
+  }
+  document.getElementById("siteLoading").remove();
+}
+
+checkMaintenance();
+
+const b = document.body;
+document.getElementById("theme").onclick = () => {
+  b.classList.toggle("light");
+  b.classList.toggle("dark");
+};
+</script>
+</body>
+</html>

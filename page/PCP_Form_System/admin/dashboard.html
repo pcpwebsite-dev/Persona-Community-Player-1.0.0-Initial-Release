@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="id">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Forms — Dashboard</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/admin.css"></head>
+<body>
+<div class="bg"></div>
+<header class="topbar"><div class="bar"><a class="brand" href="#"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><nav class="nav"><a class="active" href="./dashboard.html">FORMS</a><a href="./responses.html">RESPONSES</a><a href="#siteSettings">WEBSITE</a></nav><div class="actions"><button class="btn icon-btn" id="theme">◐</button><button class="btn" id="logout">SIGN OUT</button></div></div></header>
+<main class="container page">
+<section class="dash-head"><div><span class="badge">FIRESTORE / ADMIN</span><h1>Form <span>Workspace</span></h1><p class="muted">Buat, kelola, publish, preview, dan monitor seluruh form PCP.</p></div><button class="btn primary" id="newForm">+ NEW FORM</button></section>
+<section class="stats"><div class="card stat"><small>TOTAL FORMS</small><b id="formCount">0</b></div><div class="card stat"><small>PUBLISHED</small><b id="publishedCount">0</b></div><div class="card stat"><small>RESPONSES</small><b id="responseCount">0</b></div></section>
+
+<section id="siteSettings" class="card site-settings">
+  <div class="site-settings-head">
+    <div>
+      <span class="badge">GLOBAL WEBSITE CONTROL</span>
+      <h2>Website <span>Maintenance</span></h2>
+      <p class="muted">Kontrol status website utama secara terpusat. Perubahan di sini langsung menentukan apakah pengunjung melihat halaman utama atau halaman maintenance.</p>
+    </div>
+    <div id="maintenanceStatus" class="badge draft">CHECKING...</div>
+  </div>
+  <div class="maintenance-grid">
+    <div class="maintenance-toggle">
+      <div>
+        <b>Maintenance Mode</b>
+        <small id="maintenanceHelp" class="muted">OFF — website utama aktif.</small>
+      </div>
+      <label class="switch"><input id="maintenanceEnabled" type="checkbox"><span></span></label>
+    </div>
+    <div class="field"><label>Maintenance Title</label><input id="maintenanceTitle" value="WEBSITE SEDANG DALAM MAINTENANCE"></div>
+    <div class="field"><label>Progress (%)</label><input id="maintenanceProgress" type="number" min="0" max="100" value="72"></div>
+    <div class="field full-field"><label>Description</label><textarea id="maintenanceDescription">Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.</textarea></div>
+    <div class="field full-field"><label>Notice</label><input id="maintenanceNotice" value="Mohon tunggu beberapa saat dan coba kembali nanti."></div>
+  </div>
+  <div class="site-settings-actions">
+    <span id="maintenanceSaveState" class="muted small"></span>
+    <button class="btn primary" id="saveMaintenance">SAVE WEBSITE SETTINGS</button>
+    <button class="btn" id="openMaintenance">PREVIEW MAINTENANCE</button>
+  </div>
+</section>
+<section id="forms" class="forms-grid"></section>
+</main>
+<script type="module">
+import {auth,db,onAuthStateChanged,signOut,collection,getDocs,addDoc,serverTimestamp,getCountFromServer,doc,deleteDoc,getDoc,setDoc} from "../js/firebase.js";
+const formsEl=document.querySelector("#forms");
+let user;
+onAuthStateChanged(auth,u=>{if(!u)location.href="./index.html";else{user=u;load();loadMaintenance()}});
+logout.onclick=()=>signOut(auth);
+theme.onclick=()=>document.body.classList.toggle("light");
+newForm.onclick=async()=>{const ref=await addDoc(collection(db,"forms"),{title:"Untitled PCP Form",description:"",published:false,createdBy:user.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),settings:{collectEmail:false,showProgress:false,confirmationMessage:"Terima kasih atas respons Anda.",shuffleQuestions:false}});location.href="./builder.html?id="+ref.id};
+const maintenanceEnabled = document.querySelector("#maintenanceEnabled");
+const maintenanceTitle = document.querySelector("#maintenanceTitle");
+const maintenanceProgress = document.querySelector("#maintenanceProgress");
+const maintenanceDescription = document.querySelector("#maintenanceDescription");
+const maintenanceNotice = document.querySelector("#maintenanceNotice");
+const maintenanceStatus = document.querySelector("#maintenanceStatus");
+const maintenanceHelp = document.querySelector("#maintenanceHelp");
+const maintenanceSaveState = document.querySelector("#maintenanceSaveState");
+const saveMaintenance = document.querySelector("#saveMaintenance");
+const openMaintenance = document.querySelector("#openMaintenance");
+
+const DEFAULT_SETTINGS = {
+  enabled:false,
+  title:"WEBSITE SEDANG DALAM MAINTENANCE",
+  description:"Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.",
+  progress:72,
+  notice:"Mohon tunggu beberapa saat dan coba kembali nanti."
+};
+
+function renderMaintenance(s){
+  maintenanceEnabled.checked = s.enabled === true;
+  maintenanceTitle.value = s.title ?? DEFAULT_SETTINGS.title;
+  maintenanceProgress.value = Number(s.progress ?? DEFAULT_SETTINGS.progress);
+  maintenanceDescription.value = s.description ?? DEFAULT_SETTINGS.description;
+  maintenanceNotice.value = s.notice ?? DEFAULT_SETTINGS.notice;
+  maintenanceStatus.textContent = s.enabled ? "MAINTENANCE ON" : "WEBSITE ONLINE";
+  maintenanceStatus.className = "badge " + (s.enabled ? "draft" : "published");
+  maintenanceHelp.textContent = s.enabled
+    ? "ON — pengunjung akan diarahkan ke halaman maintenance."
+    : "OFF — website utama aktif.";
+}
+
+async function loadMaintenance(){
+  try{
+    const snap = await getDoc(doc(db,"siteSettings","general"));
+    renderMaintenance(snap.exists() ? {...DEFAULT_SETTINGS,...snap.data()} : DEFAULT_SETTINGS);
+  }catch(e){
+    maintenanceStatus.textContent="ERROR";
+    maintenanceSaveState.textContent="Gagal membaca website settings.";
+    console.error(e);
+  }
+}
+
+maintenanceEnabled.addEventListener("change",()=>{
+  const on=maintenanceEnabled.checked;
+  maintenanceStatus.textContent=on?"MAINTENANCE ON":"WEBSITE ONLINE";
+  maintenanceStatus.className="badge "+(on?"draft":"published");
+  maintenanceHelp.textContent=on?"ON — pengunjung akan diarahkan ke halaman maintenance.":"OFF — website utama aktif.";
+});
+
+saveMaintenance.onclick=async()=>{
+  saveMaintenance.disabled=true;
+  maintenanceSaveState.textContent="Saving...";
+  try{
+    const progressValue=Math.max(0,Math.min(100,Number(maintenanceProgress.value)||0));
+    const payload={
+      enabled:maintenanceEnabled.checked,
+      title:maintenanceTitle.value.trim()||DEFAULT_SETTINGS.title,
+      description:maintenanceDescription.value.trim()||DEFAULT_SETTINGS.description,
+      progress:progressValue,
+      notice:maintenanceNotice.value.trim()||DEFAULT_SETTINGS.notice,
+      updatedAt:serverTimestamp(),
+      updatedBy:user.uid
+    };
+    await setDoc(doc(db,"siteSettings","general"),payload,{merge:true});
+    renderMaintenance({...payload,enabled:payload.enabled,progress:progressValue});
+    maintenanceSaveState.textContent="Saved successfully.";
+  }catch(e){
+    maintenanceSaveState.textContent="Gagal menyimpan settings.";
+    console.error(e);
+  }finally{
+    saveMaintenance.disabled=false;
+  }
+};
+
+openMaintenance.onclick=()=>window.open("../../LockScreen/Maintenance/","_blank");
+
+async function load(){
+ const snap=await getDocs(collection(db,"forms")); formsEl.innerHTML="";let pub=0,res=0;
+ for(const d of snap.docs){const f=d.data();if(f.published)pub++;let count=0;try{count=(await getCountFromServer(collection(db,"forms",d.id,"responses"))).data().count}catch(e){}res+=count;
+ const card=document.createElement("article");card.className="form-card card";card.innerHTML=`<div class="form-card-top"><span class="badge ${f.published?"published":"draft"}">${f.published?"PUBLISHED":"DRAFT"}</span><button class="dots">•••</button></div><h3>${esc(f.title||"Untitled")}</h3><p>${esc(f.description||"No description")}</p><div class="form-meta"><span>${count} response${count!==1?"s":""}</span><span>${f.updatedAt?.toDate?f.updatedAt.toDate().toLocaleDateString("id-ID"):"—"}</span></div><div class="form-actions"><button class="btn edit">EDIT</button>${f.published?`<button class="btn open">OPEN</button>`:""}<button class="btn danger delete">DELETE</button></div>`;
+ card.querySelector(".edit").onclick=()=>location.href="./builder.html?id="+d.id;
+ if(card.querySelector(".open"))card.querySelector(".open").onclick=()=>window.open("../form/index.html?id="+d.id,"_blank");
+ card.querySelector(".delete").onclick=async()=>{if(confirm("Hapus form ini beserta dokumen form?")){await deleteDoc(doc(db,"forms",d.id));load()}};
+ formsEl.appendChild(card)}
+ formCount.textContent=snap.size;publishedCount.textContent=pub;responseCount.textContent=res;
+}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+</script>
+</body></html>
