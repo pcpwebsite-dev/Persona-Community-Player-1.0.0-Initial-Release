@@ -7,19 +7,20 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // Global website settings: only authenticated admins can control maintenance mode.
-    match /siteSettings/{settingId} {
-      allow read, create, update, delete: if signedIn();
+    // The public website must be able to read the single global maintenance
+    // flag before a visitor is authenticated. Only authenticated users may
+    // create/update/delete the setting from the admin dashboard.
+    match /siteSettings/general {
+      allow read: if true;
+      allow create, update, delete: if signedIn();
     }
 
-    // Form definitions: only Firebase-authenticated users can manage forms.
+    // Form definitions: authenticated users can manage forms.
     // Public users can only read forms that are explicitly published.
     match /forms/{formId} {
       allow read: if signedIn() || resource.data.published == true;
       allow create, update, delete: if signedIn();
 
-      // Public response endpoint:
-      // create is allowed without login; reads/updates/deletes are admin-only.
       match /responses/{responseId} {
         allow create: if
           request.resource.data.keys().hasOnly([

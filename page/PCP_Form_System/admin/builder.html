@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="id">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Forms — Builder</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/builder.css"></head>
-<body>
-<header class="topbar"><div class="bar"><a class="brand" href="./dashboard.html"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><div class="builder-actions"><span id="saveState" class="muted">Saved</span><button class="btn" id="preview">PREVIEW</button><button class="btn primary" id="publish">PUBLISH</button><button class="btn" id="back">BACK</button></div></div></header>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Forms — Builder</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/builder.css"><script>document.documentElement.dataset.theme=localStorage.getItem("pcp-theme")||"dark";</script></head>
+<body class="theme-sync">
+<header class="topbar"><div class="bar"><a class="brand" href="./dashboard.html"><img src="../../../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><div class="builder-actions"><span id="saveState" class="muted">Saved</span><button class="btn" id="preview">PREVIEW</button><button class="btn primary" id="publish">PUBLISH</button><button class="btn" id="back">BACK</button></div></div></header>
 <main class="builder container">
 <section class="editor">
   <div class="card form-settings">
@@ -39,4 +39,4 @@ back.onclick=()=>location.href="./dashboard.html";
 copyUrl.onclick=()=>navigator.clipboard.writeText(shareUrl.value);
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
 </script>
-</body></html>
+<script>document.body.classList.toggle("light",(localStorage.getItem("pcp-theme")||"dark")==="light");</script></body></html>

@@ -2,7 +2,7 @@
 <html lang="id">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Form</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/form.css"></head>
 <body>
-<div class="bg"></div><header class="topbar"><div class="container"><a class="brand" href="#"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a></div></header>
+<div class="bg"></div><header class="topbar"><div class="container form-bar"><a class="brand" href="#"><img src="../../../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><button class="btn icon-btn" id="theme" type="button" aria-label="Toggle theme">◐</button></div></header>
 <main class="public-wrap container">
 <section id="formView"></section>
 <section id="success" class="success-card card hidden"><div class="success-icon">✓</div><h1>Response <span>recorded.</span></h1><p id="successMessage"></p><button class="btn primary" onclick="location.reload()">SUBMIT ANOTHER RESPONSE</button></section>
@@ -10,6 +10,10 @@
 <script type="module">
 import {db,doc,getDoc,collection,addDoc,serverTimestamp} from "../js/firebase.js";
 const id=new URLSearchParams(location.search).get("id");let formData;
+const themeButton=document.querySelector("#theme");
+const storedTheme=localStorage.getItem("pcp-theme")||"dark";
+document.body.classList.toggle("light",storedTheme==="light");
+themeButton.onclick=()=>{const next=document.body.classList.contains("light")?"dark":"light";document.body.classList.toggle("light",next==="light");localStorage.setItem("pcp-theme",next);};
 const root=document.querySelector("#formView");
 load();
 async function load(){if(!id){root.innerHTML="<div class='card empty'>Form ID tidak ditemukan.</div>";return}const s=await getDoc(doc(db,"forms",id));if(!s.exists()||!s.data().published){root.innerHTML="<div class='card empty'><h1>Form unavailable.</h1><p>Form belum dipublish atau sudah tidak tersedia.</p></div>";return}formData=s.data();render()}

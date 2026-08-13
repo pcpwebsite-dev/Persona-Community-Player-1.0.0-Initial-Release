@@ -2,9 +2,9 @@ import { db, doc, getDoc } from "../../../js/firebase.js";
 
 const body = document.body;
 const toggle = document.getElementById("themeToggle");
-const progress = document.getElementById("progress");
-const percent = document.getElementById("percent");
 const clock = document.getElementById("clock");
+const clockDisplay = document.getElementById("clockDisplay");
+const dateDisplay = document.getElementById("dateDisplay");
 const title = document.getElementById("maintenanceTitle");
 const description = document.getElementById("maintenanceDescription");
 const notice = document.getElementById("maintenanceNotice");
@@ -13,7 +13,6 @@ const DEFAULT_SETTINGS = {
   enabled: false,
   title: "WEBSITE SEDANG DALAM MAINTENANCE",
   description: "Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.",
-  progress: 72,
   notice: "Mohon tunggu beberapa saat dan coba kembali nanti."
 };
 
@@ -27,7 +26,12 @@ toggle.addEventListener("click", () => {
 });
 
 function updateClock() {
-  clock.textContent = new Date().toLocaleTimeString("id-ID", { hour12: false });
+  const now = new Date();
+  const time = now.toLocaleTimeString("id-ID", { hour12: false });
+  const date = now.toLocaleDateString("id-ID", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
+  clock.textContent = time;
+  if(clockDisplay) clockDisplay.textContent = time;
+  if(dateDisplay) dateDisplay.textContent = date.toUpperCase();
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -39,7 +43,7 @@ async function loadMaintenanceSettings() {
 
     // Maintenance was switched off from Admin Dashboard.
     if (settings.enabled !== true) {
-      location.replace("../../../index.html");
+      location.replace("../../../");
       return;
     }
 
@@ -47,9 +51,6 @@ async function loadMaintenanceSettings() {
     if (description) description.textContent = String(settings.description || DEFAULT_SETTINGS.description);
     if (notice) notice.textContent = String(settings.notice || DEFAULT_SETTINGS.notice);
 
-    const value = Math.max(0, Math.min(100, Number(settings.progress ?? DEFAULT_SETTINGS.progress)));
-    progress.style.width = value + "%";
-    percent.textContent = value + "%";
   } catch (error) {
     // If the settings service cannot be reached, keep the maintenance page visible.
     console.error("Maintenance settings failed:", error);

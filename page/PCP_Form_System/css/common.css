@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import url("../../../css/shared.css");
 
 :root{
   --bg:#02060d;--panel:rgba(8,15,26,.84);--panel2:rgba(255,255,255,.035);
@@ -14,8 +14,8 @@ body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);t
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
-.bg{position:fixed;inset:0;z-index:-3;background:center/cover no-repeat url("../asset/background/darkbackground.png")}
-.light .bg{background-image:url("../asset/background/lightbackground.png")}
+.bg{position:fixed;inset:0;z-index:-3;background:center/cover no-repeat url("../../../asset/background/darkbackground.png")}
+.light .bg{background-image:url("../../../asset/background/lightbackground.png")}
 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,6,13,.95),rgba(2,6,13,.76) 42%,rgba(2,6,13,.35))}
 .light .bg:after{background:linear-gradient(90deg,rgba(244,250,255,.95),rgba(244,250,255,.78) 42%,rgba(244,250,255,.38))}
 .container{width:min(1180px,calc(100% - 40px));margin:auto}
@@ -44,3 +44,14 @@ label{display:block;font-size:11px;font-weight:600;margin-bottom:7px}
 .field{margin-bottom:16px}
 h1,h2,h3,.brand,.btn,.badge,.nav{font-family:"Space Grotesk",sans-serif}
 @media(max-width:700px){.container{width:min(100% - 24px,1180px)}.brand .copy{display:none}.topbar{height:68px}.page{padding-top:20px}}
+
+/* Unified PCP visual system */
+.topbar{box-shadow:0 10px 35px rgba(0,0,0,.08)}.brand img{filter:drop-shadow(0 0 12px rgba(76,168,255,.08))}.nav a{position:relative}.nav a.active:after{content:"";position:absolute;left:0;right:0;bottom:-29px;height:2px;background:var(--blue);box-shadow:0 0 12px rgba(76,168,255,.45)}
+@media(max-width:700px){.nav{gap:10px}.nav a{font-size:9px}.nav a.active:after{bottom:-20px}}
+
+
+/* Theme-ready shared controls */
+.form-bar{display:flex;align-items:center;justify-content:space-between}.icon-btn{border-radius:50%;font-size:15px}
+body.light input,body.light textarea,body.light select{background:rgba(255,255,255,.72)}
+body.light .card{box-shadow:0 20px 55px rgba(34,74,110,.10)}
+body.light .topbar{box-shadow:0 10px 35px rgba(34,74,110,.08)}

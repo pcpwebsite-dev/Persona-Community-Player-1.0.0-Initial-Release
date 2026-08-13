@@ -1,64 +1,120 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PCP</title>
-<link rel="stylesheet" href="PCP_Web_Template/css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#02060d">
+  <title>PCP — Persona Community Player</title>
+  <link rel="stylesheet" href="PCP_Web_Template/css/style.css">
+  <script>
+    document.documentElement.dataset.theme = localStorage.getItem('pcp-theme') || 'dark';
+  </script>
 </head>
-<body class="dark">
-<div id="siteLoading" class="site-loading"><span>CHECKING SYSTEM...</span></div>
+<body>
+  <div class="pcp-bg" aria-hidden="true"></div>
+  <div class="pcp-grid" aria-hidden="true"></div>
 
-<nav>
-  <img class="logo" src="asset/logo/txt.png">
-  <ul><li><a href="#">HOME</a></li><li><a href="#">COMMUNITY</a></li><li><a href="#">EVENTS</a></li><li><a href="#">CREATIVE</a></li><li><a href="#">GAMING</a></li><li><a href="#">ABOUT</a></li></ul>
-  <a class="btn" href="#">JOIN US</a>
-</nav>
-
-<header class="hero">
-  <div class="overlay">
-    <img class="title" src="asset/logo/txt.png">
-    <p>Sebuah komunitas untuk berkumpul, berinteraksi, dan berkembang bersama tanpa batas.</p>
-    <a class="btn" href="#">JOIN THE COMMUNITY</a>
+  <div id="siteLoading" class="site-loading" role="status" aria-live="polite">
+    <div class="loading-spinner"></div>
+    <span>CHECKING WEBSITE STATUS</span>
   </div>
-</header>
 
-<button id="theme">Toggle Theme</button>
+  <div class="home-shell" id="homeShell" hidden>
+    <nav class="home-nav">
+      <div class="pcp-container home-nav-inner">
+        <a class="pcp-brand" href="./" aria-label="PCP Home">
+          <img src="asset/logo/txt.png" alt="Persona Community Player">
+          <span class="pcp-brand-copy"><span>PERSONA</span><span>COMMUNITY</span><span>PLAYER</span></span>
+        </a>
 
-<script type="module">
-import { db, doc, getDoc } from "./js/firebase.js";
+        <ul class="home-links">
+          <li><a class="active" href="./">HOME</a></li>
+          <li><a href="#community">COMMUNITY</a></li>
+          <li><a href="#events">EVENTS</a></li>
+          <li><a href="#creative">CREATIVE</a></li>
+          <li><a href="#gaming">GAMING</a></li>
+          <li><a href="#about">ABOUT</a></li>
+        </ul>
 
-const MAINTENANCE_URL = "./page/LockScreen/Maintenance/";
-const DEFAULT_SETTINGS = {
-  enabled: false,
-  title: "WEBSITE SEDANG DALAM MAINTENANCE",
-  description: "Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.",
-  progress: 72,
-  notice: "Mohon tunggu beberapa saat dan coba kembali nanti."
-};
+        <div class="home-actions">
+          <button class="theme-btn" id="theme" type="button" aria-label="Switch theme">◐</button>
+          <a class="pcp-btn primary" href="./page/PCP_Form_System/">JOIN US</a>
+        </div>
+      </div>
+    </nav>
 
-async function checkMaintenance() {
-  try {
-    const snap = await getDoc(doc(db, "siteSettings", "general"));
-    const settings = snap.exists() ? { ...DEFAULT_SETTINGS, ...snap.data() } : DEFAULT_SETTINGS;
-    if (settings.enabled === true) {
-      location.replace(MAINTENANCE_URL);
-      return;
+    <main class="pcp-container hero">
+      <section class="hero-content">
+        <div class="eyebrow"><i class="pcp-dot"></i> PCP COMMUNITY PLATFORM</div>
+        <img class="hero-logo" src="asset/logo/txt.png" alt="Persona Community Player">
+        <div class="hero-line"></div>
+        <h1>Connect. Create.<br><span>Play Together.</span></h1>
+        <p>Sebuah komunitas untuk berkumpul, berinteraksi, berkarya, dan berkembang bersama dalam satu ekosistem yang modern.</p>
+        <div class="hero-actions">
+          <a class="pcp-btn primary" href="./page/PCP_Form_System/">JOIN THE COMMUNITY</a>
+          <a class="pcp-btn" href="#about">EXPLORE PCP</a>
+        </div>
+        <div class="hero-status"><i class="pcp-dot"></i><span>COMMUNITY SYSTEM ONLINE</span></div>
+      </section>
+
+      <div class="hero-orbit" aria-hidden="true">
+        <div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div>
+        <div class="orbit-center"><img src="asset/logo/txt.png" alt=""></div>
+      </div>
+    </main>
+
+    <footer class="hero-footer">
+      <span>PERSONA COMMUNITY PLAYER</span>
+      <span>PCP © 2026</span>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { db, doc, getDoc } from './js/firebase.js';
+
+    const loading = document.getElementById('siteLoading');
+    const home = document.getElementById('homeShell');
+    const themeButton = document.getElementById('theme');
+
+    function applyTheme(theme) {
+      const value = theme === 'light' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = value;
+      document.body.dataset.theme = value;
+      themeButton?.setAttribute('aria-label', value === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
     }
-  } catch (error) {
-    // Fail-open: if Firestore is unavailable, the normal homepage remains accessible.
-    console.error("Maintenance check failed:", error);
-  }
-  document.getElementById("siteLoading").remove();
-}
 
-checkMaintenance();
+    applyTheme(localStorage.getItem('pcp-theme') || 'dark');
+    themeButton?.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('pcp-theme', next);
+      applyTheme(next);
+    });
 
-const b = document.body;
-document.getElementById("theme").onclick = () => {
-  b.classList.toggle("light");
-  b.classList.toggle("dark");
-};
-</script>
+    async function checkWebsiteStatus() {
+      try {
+        const snap = await getDoc(doc(db, 'siteSettings', 'general'));
+        const enabled = snap.exists() && snap.data()?.enabled === true;
+
+        // This runs on both `/` and `/index.html`, so the canonical GitHub
+        // Pages entry point is protected by exactly the same maintenance gate.
+        if (enabled) {
+          window.location.replace('./page/LockScreen/Maintenance/');
+          return;
+        }
+
+        home.hidden = false;
+      } catch (error) {
+        // Fail closed for the public site: if the status cannot be verified,
+        // don't falsely claim that the website is online.
+        console.error('Unable to verify website status:', error);
+        window.location.replace('./page/LockScreen/Maintenance/');
+        return;
+      } finally {
+        loading.remove();
+      }
+    }
+
+    checkWebsiteStatus();
+  </script>
 </body>
 </html>

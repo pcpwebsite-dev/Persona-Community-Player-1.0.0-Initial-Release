@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>PCP Forms — Admin</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/admin.css">
-</head>
-<body>
+<script>document.documentElement.dataset.theme=localStorage.getItem("pcp-theme")||"dark";</script></head>
+<body class="theme-sync">
 <div class="bg"></div>
-<header class="topbar"><div class="container bar"><a class="brand" href="../"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><span class="badge">ADMIN ACCESS</span></div></header>
+<header class="topbar"><div class="container bar"><a class="brand" href="../"><img src="../../../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><span class="badge">ADMIN ACCESS</span></div></header>
 <main class="login-wrap">
   <section class="login-card card">
     <div class="eyebrow"><i></i> PCP FORM SYSTEM</div>
@@ -28,4 +28,4 @@ onAuthStateChanged(auth,u=>{if(u) location.href="./dashboard.html";});
 form.addEventListener("submit",async e=>{e.preventDefault();error.textContent="";try{await signInWithEmailAndPassword(auth,email.value,password.value);location.href="./dashboard.html"}catch(err){error.textContent="Email atau password tidak valid.";console.error(err)}});
 resetBtn.addEventListener("click",async()=>{if(!email.value)return error.textContent="Masukkan email terlebih dahulu.";try{await sendPasswordResetEmail(auth,email.value);error.textContent="Email reset password dikirim.";error.className="success"}catch(e){error.textContent="Tidak dapat mengirim reset password.";error.className="error"}});
 </script>
-</body></html>
+<script>document.body.classList.toggle("light",(localStorage.getItem("pcp-theme")||"dark")==="light");</script></body></html>

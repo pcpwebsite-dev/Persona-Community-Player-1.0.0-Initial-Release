@@ -3,7 +3,7 @@
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PCP Forms — Dashboard</title><link rel="stylesheet" href="../css/common.css"><link rel="stylesheet" href="../css/admin.css"></head>
 <body>
 <div class="bg"></div>
-<header class="topbar"><div class="bar"><a class="brand" href="#"><img src="../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><nav class="nav"><a class="active" href="./dashboard.html">FORMS</a><a href="./responses.html">RESPONSES</a><a href="#siteSettings">WEBSITE</a></nav><div class="actions"><button class="btn icon-btn" id="theme">◐</button><button class="btn" id="logout">SIGN OUT</button></div></div></header>
+<header class="topbar"><div class="bar"><a class="brand" href="#"><img src="../../../asset/logo/txt.png"><div class="copy"><b>PERSONA</b><b>COMMUNITY</b><b>PLAYER</b></div></a><nav class="nav"><a class="active" href="./dashboard.html">FORMS</a><a href="./responses.html">RESPONSES</a><a href="#siteSettings">WEBSITE</a></nav><div class="actions"><button class="btn icon-btn" id="theme">◐</button><button class="btn" id="logout">SIGN OUT</button></div></div></header>
 <main class="container page">
 <section class="dash-head"><div><span class="badge">FIRESTORE / ADMIN</span><h1>Form <span>Workspace</span></h1><p class="muted">Buat, kelola, publish, preview, dan monitor seluruh form PCP.</p></div><button class="btn primary" id="newForm">+ NEW FORM</button></section>
 <section class="stats"><div class="card stat"><small>TOTAL FORMS</small><b id="formCount">0</b></div><div class="card stat"><small>PUBLISHED</small><b id="publishedCount">0</b></div><div class="card stat"><small>RESPONSES</small><b id="responseCount">0</b></div></section>
@@ -26,8 +26,7 @@
       <label class="switch"><input id="maintenanceEnabled" type="checkbox"><span></span></label>
     </div>
     <div class="field"><label>Maintenance Title</label><input id="maintenanceTitle" value="WEBSITE SEDANG DALAM MAINTENANCE"></div>
-    <div class="field"><label>Progress (%)</label><input id="maintenanceProgress" type="number" min="0" max="100" value="72"></div>
-    <div class="field full-field"><label>Description</label><textarea id="maintenanceDescription">Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.</textarea></div>
+        <div class="field full-field"><label>Description</label><textarea id="maintenanceDescription">Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.</textarea></div>
     <div class="field full-field"><label>Notice</label><input id="maintenanceNotice" value="Mohon tunggu beberapa saat dan coba kembali nanti."></div>
   </div>
   <div class="site-settings-actions">
@@ -44,11 +43,13 @@ const formsEl=document.querySelector("#forms");
 let user;
 onAuthStateChanged(auth,u=>{if(!u)location.href="./index.html";else{user=u;load();loadMaintenance()}});
 logout.onclick=()=>signOut(auth);
-theme.onclick=()=>document.body.classList.toggle("light");
+const savedTheme=localStorage.getItem("pcp-theme")||"dark";
+document.body.classList.toggle("light",savedTheme==="light");
+theme.setAttribute("aria-label", savedTheme==="light" ? "Switch to dark theme" : "Switch to light theme");
+theme.onclick=()=>{const next=document.body.classList.contains("light")?"dark":"light";document.body.classList.toggle("light",next==="light");localStorage.setItem("pcp-theme",next);theme.setAttribute("aria-label",next==="light"?"Switch to dark theme":"Switch to light theme");};
 newForm.onclick=async()=>{const ref=await addDoc(collection(db,"forms"),{title:"Untitled PCP Form",description:"",published:false,createdBy:user.uid,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),settings:{collectEmail:false,showProgress:false,confirmationMessage:"Terima kasih atas respons Anda.",shuffleQuestions:false}});location.href="./builder.html?id="+ref.id};
 const maintenanceEnabled = document.querySelector("#maintenanceEnabled");
 const maintenanceTitle = document.querySelector("#maintenanceTitle");
-const maintenanceProgress = document.querySelector("#maintenanceProgress");
 const maintenanceDescription = document.querySelector("#maintenanceDescription");
 const maintenanceNotice = document.querySelector("#maintenanceNotice");
 const maintenanceStatus = document.querySelector("#maintenanceStatus");
@@ -61,14 +62,12 @@ const DEFAULT_SETTINGS = {
   enabled:false,
   title:"WEBSITE SEDANG DALAM MAINTENANCE",
   description:"Kami sedang melakukan pemeliharaan sistem untuk meningkatkan performa dan stabilitas website PCP.",
-  progress:72,
   notice:"Mohon tunggu beberapa saat dan coba kembali nanti."
 };
 
 function renderMaintenance(s){
   maintenanceEnabled.checked = s.enabled === true;
   maintenanceTitle.value = s.title ?? DEFAULT_SETTINGS.title;
-  maintenanceProgress.value = Number(s.progress ?? DEFAULT_SETTINGS.progress);
   maintenanceDescription.value = s.description ?? DEFAULT_SETTINGS.description;
   maintenanceNotice.value = s.notice ?? DEFAULT_SETTINGS.notice;
   maintenanceStatus.textContent = s.enabled ? "MAINTENANCE ON" : "WEBSITE ONLINE";
@@ -100,18 +99,16 @@ saveMaintenance.onclick=async()=>{
   saveMaintenance.disabled=true;
   maintenanceSaveState.textContent="Saving...";
   try{
-    const progressValue=Math.max(0,Math.min(100,Number(maintenanceProgress.value)||0));
     const payload={
       enabled:maintenanceEnabled.checked,
       title:maintenanceTitle.value.trim()||DEFAULT_SETTINGS.title,
       description:maintenanceDescription.value.trim()||DEFAULT_SETTINGS.description,
-      progress:progressValue,
       notice:maintenanceNotice.value.trim()||DEFAULT_SETTINGS.notice,
       updatedAt:serverTimestamp(),
       updatedBy:user.uid
     };
     await setDoc(doc(db,"siteSettings","general"),payload,{merge:true});
-    renderMaintenance({...payload,enabled:payload.enabled,progress:progressValue});
+    renderMaintenance({...payload,enabled:payload.enabled});
     maintenanceSaveState.textContent="Saved successfully.";
   }catch(e){
     maintenanceSaveState.textContent="Gagal menyimpan settings.";
