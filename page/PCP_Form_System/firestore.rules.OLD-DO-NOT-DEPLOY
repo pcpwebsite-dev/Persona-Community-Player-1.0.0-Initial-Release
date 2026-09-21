@@ -1,0 +1,21 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn(){ return request.auth != null; }
+    function publicOpen(){
+      return !exists(/databases/$(database)/documents/siteSettings/general) ||
+        (get(/databases/$(database)/documents/siteSettings/general).data.releaseState != 'maintenance' &&
+         get(/databases/$(database)/documents/siteSettings/general).data.enabled != true);
+    }
+    match /siteSettings/general { allow read: if true; allow create, update, delete: if signedIn(); }
+    match /communityProfile/main { allow read: if true; allow create, update, delete: if signedIn(); }
+    match /forms/{formId} {
+      allow read: if signedIn() || (resource.data.published == true && publicOpen());
+      allow create, update, delete: if signedIn();
+      match /responses/{responseId} {
+        allow create: if publicOpen() && get(/databases/$(database)/documents/forms/$(formId)).data.published == true && request.resource.data.answers is map && request.resource.data.answers.size() <= 100;
+        allow read, update, delete: if signedIn();
+      }
+    }
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "siteSettings": {
+    "general": {
+      "releaseState": "live",
+      "released": true,
+      "enabled": false,
+      "version": "1.3.0",
+      "maintenanceTitle": "WEBSITE SEDANG DALAM MAINTENANCE",
+      "maintenanceDescription": "Kami sedang melakukan pemeliharaan sistem untuk meningkatkan layanan PCP.",
+      "maintenanceUntil": ""
+    }
+  },
+  "communityProfile": {
+    "main": {
+      "heroDescription": "Persona Community Player adalah ruang komunitas untuk bermain, berkarya, terhubung, dan tumbuh bersama.",
+      "email": "",
+      "discord": "",
+      "instagram": ""
+    }
+  }
+}
