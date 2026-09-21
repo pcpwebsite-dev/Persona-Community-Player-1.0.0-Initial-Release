@@ -10,11 +10,11 @@ body.light{--bg:#edf4fb;--panel:rgba(255,255,255,.84);--panel2:rgba(16,58,96,.03
   --text:#081a30;--muted:#5d6f84;--line:rgba(23,67,106,.14);--blue:#176bd0;--blue2:#4b8ed8;--shadow:0 25px 60px rgba(39,78,115,.14)}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{min-height:100%}
-body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text);transition:.3s}
+body{font-family:Inter,Arial,sans-serif;background:var(--bg);color:var(--text)}
 button,input,textarea,select{font:inherit}
 button{cursor:pointer}
 a{color:inherit}
-.bg{position:fixed;inset:0;z-index:-3;background:center/cover no-repeat url("../../../asset/background/darkbackground.png")}
+.bg{position:fixed;inset:-10px;z-index:-3;background:center/cover no-repeat url("../../../asset/background/darkbackground.png");filter:blur(4px);transform:scale(1.025);will-change:filter}
 .light .bg{background-image:url("../../../asset/background/lightbackground.png")}
 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(2,6,13,.95),rgba(2,6,13,.76) 42%,rgba(2,6,13,.35))}
 .light .bg:after{background:linear-gradient(90deg,rgba(244,250,255,.95),rgba(244,250,255,.78) 42%,rgba(244,250,255,.38))}
@@ -55,3 +55,8 @@ h1,h2,h3,.brand,.btn,.badge,.nav{font-family:"Space Grotesk",sans-serif}
 body.light input,body.light textarea,body.light select{background:rgba(255,255,255,.72)}
 body.light .card{box-shadow:0 20px 55px rgba(34,74,110,.10)}
 body.light .topbar{box-shadow:0 10px 35px rgba(34,74,110,.08)}
+
+/* v1.5 instant theme: no page reload, no expensive global transitions */
+html{color-scheme:dark}html[data-theme="light"]{color-scheme:light}html[data-theme="light"] body{--bg:#edf4fb;--panel:rgba(255,255,255,.90);--panel2:rgba(16,58,96,.04);--text:#081a30;--muted:#5d6f84;--line:rgba(23,67,106,.14);--blue:#176bd0;--blue2:#4b8ed8;--shadow:0 20px 55px rgba(39,78,115,.12)}
+html[data-theme="light"] .bg{background-image:url("../../../asset/background/lightbackground.png")}
+.theme-toggle{display:inline-flex;align-items:center;gap:8px;min-width:96px;justify-content:center}

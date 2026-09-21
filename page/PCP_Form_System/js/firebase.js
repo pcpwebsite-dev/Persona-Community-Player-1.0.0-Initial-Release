@@ -49,7 +49,6 @@ function deepMerge(a,b){ if(!b||typeof b!=="object"||Array.isArray(b))return b; 
 function applyTheme(theme){
   const t=theme==="light"?"light":"dark";
   document.documentElement.dataset.theme=t;
-  document.documentElement.classList.toggle("light",t==="light");
   if(document.body) document.body.classList.toggle("light",t==="light");
   localStorage.setItem("pcp-theme",t);
   document.querySelectorAll("[data-theme-toggle]").forEach(b=>{b.textContent=t==="light"?"☀  LIGHT":"☾  DARK"; b.setAttribute("aria-label",`Switch to ${t==="light"?"dark":"light"} theme`)});
