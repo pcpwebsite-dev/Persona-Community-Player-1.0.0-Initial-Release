@@ -2,29 +2,18 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn(){ return request.auth != null; }
-    function siteLive(){
-      return exists(/databases/$(database)/documents/siteSettings/general)
-        && get(/databases/$(database)/documents/siteSettings/general).data.releaseState == 'live'
-        && get(/databases/$(database)/documents/siteSettings/general).data.responsesEnabled != false;
+    function publicOpen(){
+      return !exists(/databases/$(database)/documents/siteSettings/general) ||
+        (get(/databases/$(database)/documents/siteSettings/general).data.releaseState != 'maintenance' &&
+         get(/databases/$(database)/documents/siteSettings/general).data.enabled != true);
     }
-    match /siteSettings/general {
-      allow read: if true;
-      allow create, update, delete: if signedIn();
-    }
-    match /communityProfile/main {
-      allow read: if true;
-      allow create, update, delete: if signedIn();
-    }
+    match /siteSettings/general { allow read: if true; allow create, update, delete: if signedIn(); }
+    match /communityProfile/main { allow read: if true; allow create, update, delete: if signedIn(); }
     match /forms/{formId} {
-      allow read: if signedIn() || (resource.data.published == true && siteLive());
+      allow read: if signedIn() || (resource.data.published == true && publicOpen());
       allow create, update, delete: if signedIn();
       match /responses/{responseId} {
-        allow create: if siteLive()
-          && get(/databases/$(database)/documents/forms/$(formId)).data.published == true
-          && request.resource.data.answers is map
-          && request.resource.data.answers.size() <= 100
-          && request.resource.data.userAgent is string
-          && request.resource.data.userAgent.size() <= 1000;
+        allow create: if publicOpen() && get(/databases/$(database)/documents/forms/$(formId)).data.published == true && request.resource.data.answers is map && request.resource.data.answers.size() <= 100;
         allow read, update, delete: if signedIn();
       }
     }
