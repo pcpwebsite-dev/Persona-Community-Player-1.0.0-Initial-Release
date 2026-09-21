@@ -1,39 +1,30 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    function signedIn() {
-      return request.auth != null;
+    function signedIn(){ return request.auth != null; }
+    function siteLive(){
+      return exists(/databases/$(database)/documents/siteSettings/general)
+        && get(/databases/$(database)/documents/siteSettings/general).data.releaseState == 'live'
+        && get(/databases/$(database)/documents/siteSettings/general).data.responsesEnabled != false;
     }
-
-    // The public website must be able to read the single global maintenance
-    // flag before a visitor is authenticated. Only authenticated users may
-    // create/update/delete the setting from the admin dashboard.
     match /siteSettings/general {
       allow read: if true;
       allow create, update, delete: if signedIn();
     }
-
-    // Form definitions: authenticated users can manage forms.
-    // Public users can only read forms that are explicitly published.
-    match /forms/{formId} {
-      allow read: if signedIn() || resource.data.published == true;
+    match /communityProfile/main {
+      allow read: if true;
       allow create, update, delete: if signedIn();
-
+    }
+    match /forms/{formId} {
+      allow read: if signedIn() || (resource.data.published == true && siteLive());
+      allow create, update, delete: if signedIn();
       match /responses/{responseId} {
-        allow create: if
-          request.resource.data.keys().hasOnly([
-            'answers',
-            'submittedAt',
-            'userAgent',
-            'formVersion'
-          ])
+        allow create: if siteLive()
+          && get(/databases/$(database)/documents/forms/$(formId)).data.published == true
           && request.resource.data.answers is map
           && request.resource.data.answers.size() <= 100
           && request.resource.data.userAgent is string
           && request.resource.data.userAgent.size() <= 1000;
-
         allow read, update, delete: if signedIn();
       }
     }

@@ -41,9 +41,15 @@ async function loadMaintenanceSettings() {
     const snap = await getDoc(doc(db, "siteSettings", "general"));
     const settings = snap.exists() ? { ...DEFAULT_SETTINGS, ...snap.data() } : DEFAULT_SETTINGS;
 
-    // Maintenance was switched off from Admin Dashboard.
-    if (settings.enabled !== true) {
-      location.replace("../../../");
+    const mode = new URLSearchParams(location.search).get("mode");
+    const state = settings.releaseState || (settings.enabled ? "maintenance" : "live");
+    const shouldLock = state === "maintenance" || state === "pre_release";
+    if (!shouldLock) { location.replace("../../../"); return; }
+    if (state === "pre_release" || mode === "prerelease") {
+      if (title) title.textContent = "PCP IS PREPARING FOR RELEASE";
+      if (description) description.textContent = "Persona Community Player sedang berada pada tahap final preparation sebelum dibuka secara resmi untuk publik.";
+      if (notice) notice.textContent = settings.launchDate ? `Target release: ${settings.launchDate}` : "Official community access will be available soon.";
+      document.querySelector(".maintenance-state")?.replaceChildren(document.createTextNode("PRE-RELEASE"));
       return;
     }
 

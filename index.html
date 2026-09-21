@@ -1,120 +1,18 @@
 <!doctype html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#02060d">
-  <title>PCP — Persona Community Player</title>
-  <link rel="stylesheet" href="PCP_Web_Template/css/style.css">
-  <script>
-    document.documentElement.dataset.theme = localStorage.getItem('pcp-theme') || 'dark';
-  </script>
-</head>
-<body>
-  <div class="pcp-bg" aria-hidden="true"></div>
-  <div class="pcp-grid" aria-hidden="true"></div>
-
-  <div id="siteLoading" class="site-loading" role="status" aria-live="polite">
-    <div class="loading-spinner"></div>
-    <span>CHECKING WEBSITE STATUS</span>
-  </div>
-
-  <div class="home-shell" id="homeShell" hidden>
-    <nav class="home-nav">
-      <div class="pcp-container home-nav-inner">
-        <a class="pcp-brand" href="./" aria-label="PCP Home">
-          <img src="asset/logo/txt.png" alt="Persona Community Player">
-          <span class="pcp-brand-copy"><span>PERSONA</span><span>COMMUNITY</span><span>PLAYER</span></span>
-        </a>
-
-        <ul class="home-links">
-          <li><a class="active" href="./">HOME</a></li>
-          <li><a href="#community">COMMUNITY</a></li>
-          <li><a href="#events">EVENTS</a></li>
-          <li><a href="#creative">CREATIVE</a></li>
-          <li><a href="#gaming">GAMING</a></li>
-          <li><a href="#about">ABOUT</a></li>
-        </ul>
-
-        <div class="home-actions">
-          <button class="theme-btn" id="theme" type="button" aria-label="Switch theme">◐</button>
-          <a class="pcp-btn primary" href="./page/PCP_Form_System/">JOIN US</a>
-        </div>
-      </div>
-    </nav>
-
-    <main class="pcp-container hero">
-      <section class="hero-content">
-        <div class="eyebrow"><i class="pcp-dot"></i> PCP COMMUNITY PLATFORM</div>
-        <img class="hero-logo" src="asset/logo/txt.png" alt="Persona Community Player">
-        <div class="hero-line"></div>
-        <h1>Connect. Create.<br><span>Play Together.</span></h1>
-        <p>Sebuah komunitas untuk berkumpul, berinteraksi, berkarya, dan berkembang bersama dalam satu ekosistem yang modern.</p>
-        <div class="hero-actions">
-          <a class="pcp-btn primary" href="./page/PCP_Form_System/">JOIN THE COMMUNITY</a>
-          <a class="pcp-btn" href="#about">EXPLORE PCP</a>
-        </div>
-        <div class="hero-status"><i class="pcp-dot"></i><span>COMMUNITY SYSTEM ONLINE</span></div>
-      </section>
-
-      <div class="hero-orbit" aria-hidden="true">
-        <div class="orbit one"></div><div class="orbit two"></div><div class="orbit three"></div>
-        <div class="orbit-center"><img src="asset/logo/txt.png" alt=""></div>
-      </div>
-    </main>
-
-    <footer class="hero-footer">
-      <span>PERSONA COMMUNITY PLAYER</span>
-      <span>PCP © 2026</span>
-    </footer>
-  </div>
-
-  <script type="module">
-    import { db, doc, getDoc } from './js/firebase.js';
-
-    const loading = document.getElementById('siteLoading');
-    const home = document.getElementById('homeShell');
-    const themeButton = document.getElementById('theme');
-
-    function applyTheme(theme) {
-      const value = theme === 'light' ? 'light' : 'dark';
-      document.documentElement.dataset.theme = value;
-      document.body.dataset.theme = value;
-      themeButton?.setAttribute('aria-label', value === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
-    }
-
-    applyTheme(localStorage.getItem('pcp-theme') || 'dark');
-    themeButton?.addEventListener('click', () => {
-      const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('pcp-theme', next);
-      applyTheme(next);
-    });
-
-    async function checkWebsiteStatus() {
-      try {
-        const snap = await getDoc(doc(db, 'siteSettings', 'general'));
-        const enabled = snap.exists() && snap.data()?.enabled === true;
-
-        // This runs on both `/` and `/index.html`, so the canonical GitHub
-        // Pages entry point is protected by exactly the same maintenance gate.
-        if (enabled) {
-          window.location.replace('./page/LockScreen/Maintenance/');
-          return;
-        }
-
-        home.hidden = false;
-      } catch (error) {
-        // Fail closed for the public site: if the status cannot be verified,
-        // don't falsely claim that the website is online.
-        console.error('Unable to verify website status:', error);
-        window.location.replace('./page/LockScreen/Maintenance/');
-        return;
-      } finally {
-        loading.remove();
-      }
-    }
-
-    checkWebsiteStatus();
-  </script>
-</body>
-</html>
+<html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#050914"><meta name="description" content="Persona Community Player — community hub untuk player, creator, dan member yang tumbuh bersama."><title>PCP — Persona Community Player</title><link rel="stylesheet" href="PCP_Web_Template/css/style.css"><script>document.documentElement.dataset.theme=localStorage.getItem('pcp-theme')||'dark'</script></head>
+<body><div class="pcp-bg"></div><div class="pcp-grid"></div><div id="siteLoading" class="site-loading"><div class="loading-spinner"></div><span>INITIALIZING PCP</span></div>
+<div class="home-shell" id="homeShell" hidden>
+<header class="home-nav"><div class="pcp-container home-nav-inner"><a class="pcp-brand" href="#home"><img src="asset/logo/txt.png" alt="PCP"><span class="pcp-brand-copy"><span>PERSONA</span><span>COMMUNITY</span><span>PLAYER</span></span></a><nav class="home-links" id="navLinks"><a href="#home">HOME</a><a href="#about">ABOUT</a><a href="#pillars">COMMUNITY</a><a href="#programs">PROGRAMS</a><a href="#values">VALUES</a><a href="#contact">CONTACT</a></nav><div class="home-actions"><button class="theme-btn" id="theme" aria-label="Switch theme">◐</button><a class="pcp-btn primary desktop-join" href="./page/PCP_Form_System/">JOIN PCP</a><button class="menu-btn" id="menuBtn" aria-label="Open menu">☰</button></div></div></header>
+<div id="announcement" class="announcement" hidden><div class="pcp-container"><span class="announce-tag">NOTICE</span><span id="announcementText"></span><button id="closeAnnouncement">×</button></div></div>
+<main id="home">
+<section class="hero pcp-container"><div class="hero-content"><div class="eyebrow"><i class="pcp-dot"></i><span id="releaseLabel">OFFICIAL COMMUNITY PLATFORM</span></div><img class="hero-logo" src="asset/logo/txt.png" alt="Persona Community Player"><h1>One community.<br><span>Many personas.</span></h1><p id="heroDescription">Ruang komunitas modern untuk player, creator, dan individu yang ingin terhubung, berkolaborasi, bermain, dan berkembang bersama.</p><div class="hero-actions"><a class="pcp-btn primary large" href="./page/PCP_Form_System/">JOIN THE COMMUNITY <b>↗</b></a><a class="pcp-btn large" href="#about">DISCOVER PCP</a></div><div class="hero-meta"><div><i class="pcp-dot"></i><span id="systemStatus">COMMUNITY ONLINE</span></div><div><span class="meta-label">VERSION</span><strong id="siteVersion">1.0.0</strong></div></div></div><div class="hero-visual"><div class="visual-card main"><span class="visual-kicker">PCP / COMMUNITY HUB</span><div class="monogram">PCP</div><p>PLAY • CONNECT • CREATE</p></div><div class="float-card fc1"><span>COMMUNITY</span><b>CONNECTED</b></div><div class="float-card fc2"><span>STATUS</span><b class="online">● ONLINE</b></div></div></section>
+<section class="trust-strip"><div class="pcp-container"><span>BUILT FOR COMMUNITY</span><i></i><span>PLAYER FIRST</span><i></i><span>CREATIVE SPACE</span><i></i><span>SAFE & INCLUSIVE</span><i></i><span>GROW TOGETHER</span></div></section>
+<section class="section pcp-container" id="about"><div class="section-heading"><span class="section-no">01</span><div><span class="eyebrow-text">WHO WE ARE</span><h2>More than a place to play.</h2></div></div><div class="about-grid"><article class="about-lead"><p class="lead">Persona Community Player adalah komunitas yang dibangun sebagai ruang bersama bagi orang-orang dengan minat, persona, dan kreativitas yang berbeda.</p><p>Kami percaya komunitas yang baik bukan sekadar ramai. PCP dibangun untuk menciptakan koneksi yang sehat, aktivitas yang terarah, ruang berekspresi, dan pengalaman yang membuat setiap member merasa punya tempat.</p><div class="signature-line"><span>PERSONA COMMUNITY PLAYER</span><span>EST. 2026</span></div></article><div class="about-cards"><article class="mini-card"><span>MISSION</span><h3>Connect people.</h3><p>Membangun lingkungan tempat member mudah menemukan teman, tim, dan kolaborator.</p></article><article class="mini-card"><span>VISION</span><h3>Grow together.</h3><p>Menjadi community hub yang sehat, aktif, kreatif, dan dapat berkembang bersama membernya.</p></article></div></div></section>
+<section class="section section-wide" id="pillars"><div class="pcp-container"><div class="section-heading"><span class="section-no">02</span><div><span class="eyebrow-text">OUR COMMUNITY</span><h2>Built around what we love.</h2></div></div><div class="pillar-grid"><article class="pillar featured"><span class="pillar-index">01</span><div class="pillar-icon">⌁</div><h3>Gaming</h3><p>Mabar, squad, casual sessions, competitive play, dan ruang diskusi game lintas genre.</p><span class="pillar-foot">PLAY TOGETHER</span></article><article class="pillar"><span class="pillar-index">02</span><div class="pillar-icon">◇</div><h3>Creative</h3><p>Tempat untuk berbagi karya, ide, desain, konten, musik, dan project kolaboratif.</p><span class="pillar-foot">CREATE TOGETHER</span></article><article class="pillar"><span class="pillar-index">03</span><div class="pillar-icon">◎</div><h3>Social</h3><p>Ruang ngobrol, kenalan, berbagi pengalaman, dan membangun relasi yang positif.</p><span class="pillar-foot">CONNECT TOGETHER</span></article><article class="pillar"><span class="pillar-index">04</span><div class="pillar-icon">△</div><h3>Events</h3><p>Community night, challenge, tournament, creative event, dan agenda internal lainnya.</p><span class="pillar-foot">EXPERIENCE TOGETHER</span></article></div></div></section>
+<section class="section pcp-container" id="programs"><div class="section-heading"><span class="section-no">03</span><div><span class="eyebrow-text">WHAT HAPPENS HERE</span><h2>Community in motion.</h2></div></div><div class="program-list"><article><span class="program-no">01</span><div><h3>Community Sessions</h3><p>Agenda rutin untuk main, ngobrol, dan mengenal member lain tanpa tekanan.</p></div><span class="program-tag">SOCIAL</span></article><article><span class="program-no">02</span><div><h3>Game Nights & Challenges</h3><p>Aktivitas gaming terjadwal, mini challenge, hingga event kompetitif komunitas.</p></div><span class="program-tag">GAMING</span></article><article><span class="program-no">03</span><div><h3>Creative Showcase</h3><p>Ruang bagi member untuk menampilkan karya dan mendapatkan exposure di komunitas.</p></div><span class="program-tag">CREATIVE</span></article><article><span class="program-no">04</span><div><h3>Collaboration Projects</h3><p>Project bersama yang mempertemukan skill, minat, dan persona yang berbeda.</p></div><span class="program-tag">COLLAB</span></article></div></section>
+<section class="section values-section" id="values"><div class="pcp-container values-layout"><div><span class="eyebrow-text">OUR PRINCIPLES</span><h2>A community worth belonging to.</h2><p>Standar sederhana yang menjadi dasar bagaimana PCP tumbuh dan berinteraksi.</p></div><div class="values-grid"><article><b>01</b><h3>Respect First</h3><p>Hormati orang lain, batasan mereka, dan perbedaan yang ada.</p></article><article><b>02</b><h3>Be Collaborative</h3><p>Berbagi ruang, peluang, pengetahuan, dan tumbuh bersama.</p></article><article><b>03</b><h3>Stay Authentic</h3><p>Jadilah diri sendiri tanpa harus menjatuhkan persona orang lain.</p></article><article><b>04</b><h3>Keep It Safe</h3><p>Jaga komunitas tetap nyaman, aman, dan bertanggung jawab.</p></article></div></div></section>
+<section class="section pcp-container"><div class="cta-panel"><div><span class="eyebrow-text">YOUR PERSONA BELONGS HERE</span><h2>Ready to join the community?</h2><p>Kenalan dengan PCP, isi form membership, dan mulai perjalananmu bersama komunitas.</p></div><a class="pcp-btn primary large" href="./page/PCP_Form_System/">START HERE ↗</a></div></section>
+</main>
+<footer id="contact"><div class="pcp-container footer-grid"><div><img src="asset/logo/txt.png" alt="PCP"><p>Persona Community Player.<br>Connect. Create. Play Together.</p></div><div><span>EXPLORE</span><a href="#about">About PCP</a><a href="#pillars">Community</a><a href="#programs">Programs</a><a href="./page/PCP_Form_System/">Join Us</a></div><div><span>COMMUNITY</span><a id="discordLink" href="#">Discord</a><a id="instagramLink" href="#">Instagram</a><a id="emailLink" href="#">Contact</a></div><div><span>SYSTEM</span><p><i class="pcp-dot"></i> <b id="footerStatus">OPERATIONAL</b></p><small id="footerVersion">PCP v1.0.0</small></div></div><div class="pcp-container footer-bottom"><span>© 2026 PERSONA COMMUNITY PLAYER</span><span>MADE FOR THE COMMUNITY</span></div></footer>
+</div>
+<script type="module">import{db,doc,getDoc}from'./js/firebase.js';const $=s=>document.querySelector(s);const loading=$('#siteLoading'),home=$('#homeShell');function theme(t){t=t==='light'?'light':'dark';document.documentElement.dataset.theme=t;document.body.dataset.theme=t}theme(localStorage.getItem('pcp-theme'));$('#theme').onclick=()=>{let n=document.documentElement.dataset.theme==='dark'?'light':'dark';localStorage.setItem('pcp-theme',n);theme(n)};$('#menuBtn').onclick=()=>$('#navLinks').classList.toggle('open');document.querySelectorAll('#navLinks a').forEach(a=>a.onclick=()=>$('#navLinks').classList.remove('open'));$('#closeAnnouncement').onclick=()=>$('#announcement').hidden=true;async function init(){try{const [s,p]=await Promise.all([getDoc(doc(db,'siteSettings','general')),getDoc(doc(db,'communityProfile','main'))]);const cfg=s.exists()?s.data():{};if(cfg.enabled===true||cfg.releaseState==='maintenance'){location.replace('./page/LockScreen/Maintenance/');return}if(cfg.releaseState==='pre_release'||cfg.released===false){location.replace('./page/LockScreen/Maintenance/?mode=prerelease');return}$('#siteVersion').textContent=cfg.version||'1.0.0';$('#footerVersion').textContent='PCP v'+(cfg.version||'1.0.0');if(cfg.announcementEnabled&&cfg.announcement){$('#announcementText').textContent=cfg.announcement;$('#announcement').hidden=false}if(p.exists()){const d=p.data();if(d.heroDescription)$('#heroDescription').textContent=d.heroDescription;if(d.discord)$('#discordLink').href=d.discord;if(d.instagram)$('#instagramLink').href=d.instagram;if(d.email){$('#emailLink').href='mailto:'+d.email;$('#emailLink').textContent=d.email}}home.hidden=false}catch(e){console.error(e);location.replace('./page/LockScreen/Maintenance/')}finally{loading.remove()}}init();</script></body></html>
