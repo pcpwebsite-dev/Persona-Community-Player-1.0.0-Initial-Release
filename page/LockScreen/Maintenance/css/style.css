@@ -269,3 +269,7 @@ body[data-theme="light"] footer{background:rgba(247,251,255,.4)}
 .maintenance-box{padding:18px 20px 16px}
 .box-top strong{font-size:11px;letter-spacing:1px;color:var(--blue-soft)}
 @media(max-width:700px){.clock-display{font-size:34px;letter-spacing:2px}.box-bottom{gap:15px}.box-bottom span:last-child{text-align:right}}
+
+.admin-access-btn{display:inline-flex;align-items:center;justify-content:center;min-height:36px;padding:0 14px;border:1px solid var(--line);border-radius:9px;color:var(--text);text-decoration:none;font:700 9px "Space Grotesk",sans-serif;letter-spacing:1.2px;background:rgba(76,168,255,.07);transition:.2s ease}.admin-access-btn:hover{border-color:var(--blue);background:rgba(76,168,255,.14);transform:translateY(-1px)}@media(max-width:700px){.admin-access-btn{padding:0 10px;font-size:8px}}
+
+.background{filter:blur(3px);transform:scale(1.015)}
