@@ -2,7 +2,6 @@
   "rules": {
     ".read": false,
     ".write": false,
-
     "siteSettings": {
       "general": {
         ".read": true,
@@ -10,14 +9,12 @@
         ".validate": "newData.hasChildren(['releaseState']) && (newData.child('releaseState').val() === 'live' || newData.child('releaseState').val() === 'maintenance')"
       }
     },
-
     "communityProfile": {
       "main": {
         ".read": true,
         ".write": "auth != null"
       }
     },
-
     "forms": {
       ".read": "auth != null",
       "$formId": {
@@ -26,17 +23,15 @@
         ".validate": "newData.hasChildren(['title'])"
       }
     },
-
     "responses": {
       ".read": "auth != null",
       "$formId": {
         "$responseId": {
-          ".write": "auth != null || (!data.exists() && root.child('siteSettings/general/releaseState').val() === 'live' && root.child('forms').child($formId).child('published').val() === true)",
+          ".write": "auth != null || (!data.exists() && root.child('siteSettings/general/releaseState').val() !== 'maintenance' && root.child('forms').child($formId).child('published').val() === true)",
           ".validate": "newData.hasChildren(['answers', 'submittedAt'])"
         }
       }
     },
-
     "admin_audit": {
       ".read": "auth != null",
       ".write": "auth != null"

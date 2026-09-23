@@ -40,7 +40,7 @@ async function updateDoc(r,data){ await update(ref(db,r.path),data); }
 async function deleteDoc(r){ await remove(ref(db,r.path)); }
 async function addDoc(r,data){ const n=push(ref(db,r.path)); await set(n,data); return {id:n.key,path:`${r.path}/${n.key}`}; }
 function serverTimestamp(){ return rtdbServerTimestamp(); }
-function onSnapshot(r,cb,err){ return onValue(ref(db,r.path),s=>cb(snapFor(r.parts.at(-1),s.val())),err); }
+function onSnapshot(r,cb,err){ return onValue(ref(db,r.path),s=>{ const value=s.val(); if(r.kind==="collection"){const docs=Object.entries(value||{}).map(([k,v])=>snapFor(k,v));cb({docs,size:docs.length,empty:docs.length===0,forEach:fn=>docs.forEach(fn)});}else cb(snapFor(r.parts.at(-1),value)); },err); }
 function query(r){ return r; } function where(){return null} function orderBy(){return null} function limit(){return null}
 async function getCountFromServer(r){ const q=await getDocs(r); return {data:()=>({count:q.size})}; }
 function deepMerge(a,b){ if(!b||typeof b!=="object"||Array.isArray(b))return b; const out={...(a||{})}; for(const[k,v]of Object.entries(b)) out[k]=(v&&typeof v==="object"&&!Array.isArray(v))?deepMerge(out[k],v):v; return out; }
