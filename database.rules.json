@@ -20,14 +20,14 @@
       "$formId": {
         ".read": "auth != null || data.child('published').val() === true",
         ".write": "auth != null",
-        ".validate": "newData.hasChildren(['title'])"
+        ".validate": "newData.hasChildren(['title']) && newData.child('title').isString() && newData.child('title').val().length > 0 && newData.child('title').val().length <= 200"
       }
     },
     "responses": {
       ".read": "auth != null",
       "$formId": {
         "$responseId": {
-          ".write": "auth != null || (!data.exists() && root.child('siteSettings/general/releaseState').val() !== 'maintenance' && root.child('forms').child($formId).child('published').val() === true)",
+          ".write": "auth != null || (!data.exists() && root.child('siteSettings/general/releaseState').val() === 'live' && root.child('forms').child($formId).child('published').val() === true)",
           ".validate": "newData.hasChildren(['answers', 'submittedAt'])"
         }
       }
