@@ -1,0 +1,14 @@
+{
+  "files_total": 74,
+  "html_total": 17,
+  "admin_pages": [
+    "builder.html",
+    "community.html",
+    "dashboard.html",
+    "index.html",
+    "operations.html",
+    "responses.html",
+    "status.html"
+  ],
+  "missing_relative_links": []
+}
