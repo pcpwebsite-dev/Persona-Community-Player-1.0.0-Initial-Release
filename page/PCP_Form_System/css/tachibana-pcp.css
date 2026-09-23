@@ -1,0 +1,15 @@
+/* Tachibana Community form reading layout, recolored for Persona Community Player. */
+:root{--tach-border:rgba(137,155,197,.27);--tach-accent:#64b6ff;--tach-card:rgba(18,25,47,.95)}
+[data-theme="light"]{--tach-border:#e5e7eb;--tach-accent:#3466c5;--tach-card:#fff}
+body{font-family:"Plus Jakarta Sans",Inter,system-ui,sans-serif}
+#root,.public-shell,.form-shell,.container{max-width:740px;margin-inline:auto}
+.question.card.tach-field{border:1px solid var(--tach-border);border-radius:16px;padding:26px 28px;margin:0 0 18px;background:var(--tach-card);box-shadow:0 9px 28px rgba(0,0,0,.07)}
+.tach-field .question-label{display:block;font-size:15px;font-weight:700;line-height:1.6;margin-bottom:14px}
+.tach-field input:not([type=radio]):not([type=checkbox]),.tach-field textarea,.tach-field select{width:100%;padding:14px 16px;border:2px solid var(--tach-border);border-radius:12px;font:inherit;background:var(--tach-card);color:inherit;outline:none}
+.tach-field textarea{min-height:120px;resize:vertical}
+.tach-field input:focus,.tach-field textarea:focus,.tach-field select:focus{border-color:var(--tach-accent);box-shadow:0 0 0 3px rgba(100,182,255,.15)}
+.tach-option{display:flex;align-items:center;gap:13px;padding:14px 18px;margin:10px 0;border:2px solid var(--tach-border);border-radius:12px;cursor:pointer;transition:border-color .16s,background .16s}
+.tach-option:hover,.tach-option:has(input:checked){border-color:var(--tach-accent);background:rgba(100,182,255,.09)}
+.tach-option input{accent-color:var(--tach-accent);width:18px;height:18px;flex-shrink:0}
+.form-nav{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+@media(max-width:600px){.question.card.tach-field{padding:20px 17px;border-radius:13px}.tach-option{padding:12px}}
